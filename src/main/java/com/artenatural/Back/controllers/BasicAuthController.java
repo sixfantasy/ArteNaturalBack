@@ -42,12 +42,7 @@ import java.security.Principal;
                 return ResponseEntity.ok("User registered successfully!");
         }
         @GetMapping(path = "/validate")
-        public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String auth){
-            String token = auth;
-            User user = userRepository.findByUsername(jwtTokenUtil.getUsernameFromToken(token));
-            if(jwtTokenUtil.validateToken(token,user))
-                return ResponseEntity.ok("Token is valid");
-            else
-                return ResponseEntity.badRequest().body("Token is not valid");
-            }
+        public ResponseEntity<String> validateToken(){
+            return ResponseEntity.ok("Token is valid");
         }
+}

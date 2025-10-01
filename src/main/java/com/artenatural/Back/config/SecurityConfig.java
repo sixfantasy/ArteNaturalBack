@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 // Define authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Permit access to specific endpoints
+                        .requestMatchers("/auth/login", "/auth/register").permitAll() // Permit access to specific endpoints
                         .anyRequest().authenticated() // All other requests require authentication
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
