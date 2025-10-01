@@ -29,6 +29,11 @@ import java.util.function.Function;
             return getClaimFromToken(token, Claims::getSubject);
         }
 
+        //retrieve user id from jwt token
+        public String getUserIdFromToken(String token) {
+            return getClaimFromToken(token, Claims::getId);
+        }
+
         //retrieve expiration date from jwt token
         public Date getExpirationDateFromToken(String token) {
             return getClaimFromToken(token, Claims::getExpiration);

@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+    @Inheritance(strategy = InheritanceType.JOINED)
     @Setter
     @Entity
     @Table(name = "user")
@@ -31,6 +32,7 @@ import lombok.Setter;
         private int id;
         private String username;
         private String password;
+        private String displayName;
         private boolean accountNonExpired;
         private boolean accountNonLocked;
         private boolean credentialsNonExpired;
@@ -38,7 +40,7 @@ import lombok.Setter;
         private int age;
         private String interests;
 
-        @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users", cascade = CascadeType.REMOVE)
+        @ManyToMany
         private List<Role> roles;
 
         @Override
