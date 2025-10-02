@@ -1,5 +1,6 @@
 package com.artenatural.Back.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,7 @@ import java.util.List;
          */
         private String roleName;
 
+        @JsonIgnore
         @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
         private List<User> users;
 
