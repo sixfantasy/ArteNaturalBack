@@ -24,7 +24,7 @@ public class UserController {
         return userRepository.findById(id).orElse(null);
     }
     @PutMapping()
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User user, @RequestHeader String token) {
         return userRepository.save(user);
     }
     @DeleteMapping()
