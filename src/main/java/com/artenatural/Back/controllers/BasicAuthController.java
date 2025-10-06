@@ -1,5 +1,6 @@
 package com.artenatural.Back.controllers;
 
+import com.artenatural.Back.entities.Role;
 import com.artenatural.Back.entities.User;
 import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 
 @CrossOrigin
     @RestController
@@ -27,8 +29,8 @@ import java.security.Principal;
 
         @PostMapping(path = "/login")
         public ResponseEntity<String> basicauth(Principal principal) {
-
-            final String token = jwtTokenUtil.generateToken(principal.getName());
+            final User user = userRepository.findByUsername(principal.getName());
+            final String token = jwtTokenUtil.generateToken(user.getUsername(), user.getId().toString());
             return ResponseEntity.ok().body(token);
         }
         @PostMapping(path = "/register")
@@ -38,13 +40,16 @@ import java.security.Principal;
                     return ResponseEntity.badRequest().body("Error: Username is already taken!");
                 }
                 User user = new User(userPass.getUsername(), passwordEncoder.encode(userPass.getPassword()));
+                user.setRoles(new ArrayList<>());
+                user.getRoles().add(new Role(userPass.getRole()));
                 userRepository.save(user);
                 return ResponseEntity.ok("User registered successfully!");
         }
         @GetMapping(path = "/validate")
         public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String auth){
-
+                jwtTokenUtil.getAllClaimsFromToken(auth.substring(7));
                 return ResponseEntity.ok("Token is valid");
+
 
             }
         }

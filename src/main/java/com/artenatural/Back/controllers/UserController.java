@@ -1,10 +1,10 @@
 package com.artenatural.Back.controllers;
 
 import com.artenatural.Back.repositories.UserRepository;
+import com.artenatural.Back.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.artenatural.Back.entities.User;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -14,9 +14,17 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+    @GetMapping("/me")
+    public User getUserByToken(@RequestHeader String token) {
+        String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
+        return userRepository.findById(Integer.parseInt(userID)).get();
     }
 
     @GetMapping("/{id}")

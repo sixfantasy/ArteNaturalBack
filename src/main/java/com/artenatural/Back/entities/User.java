@@ -3,6 +3,8 @@ package com.artenatural.Back.entities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +31,7 @@ import lombok.Setter;
         }
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY) // Para generar números autoincrementados
-        private int id;
+        private Integer id;
         private String username;
         private String password;
         private String displayName;
@@ -42,6 +44,9 @@ import lombok.Setter;
 
         @ManyToMany
         private List<Role> roles;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+        private ArtistData artistData;
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,7 +1,11 @@
 package com.artenatural.Back.controllers;
 
+import com.artenatural.Back.entities.ArtistData;
+import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
+import com.artenatural.Back.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +14,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @RestController
@@ -17,18 +22,36 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class UploadController {
     private final  String projectPath = System.getProperty("user.dir");
-    private final Path root = Paths.get(projectPath, "static", "uploads");
+    @Value("${app.images-path}")
+    private String imagesPath;
+    private Path root;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/upload")
     public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) {
         try {
-            String userID = jwtTokenUtil.getUserIdFromToken(token);
-            Path userPath = this.root.resolve(userID);
-            Path endPath = userPath.resolve(file.getOriginalFilename());
-            Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
+            this.root = Paths.get(this.imagesPath);
+            String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
+            System.out.println("userID = " + userID);
+            User user = userRepository.findById(Integer.parseInt(userID)).get();
+            Path userPath = Paths.get(this.root.toString(), userID);
+            if (!Files.exists(userPath))
+                Files.createDirectory(userPath);
+            Files.copy(file.getInputStream(), userPath.resolve(file.getOriginalFilename()));
+            if(user.getArtistData() == null) {
+                ArtistData artistData = new ArtistData();
+                artistData.setImages(new ArrayList<>());
+                artistData.getImages().add(String.format("/Images/%s/%s", userID, file.getOriginalFilename()));
+                user.setArtistData(artistData);
+            }
+            else
+                user.getArtistData().getImages().add(String.format("/Images/%s/%s", userID, file.getOriginalFilename()));
+            userRepository.save(user);
             return ResponseEntity.ok().body("{\"resp\":\"Archivo cargado con éxito\"}");
+
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("A file of that name already exists.");
@@ -37,11 +60,11 @@ public class UploadController {
         }
     }
     @GetMapping("/list")
-    public ResponseEntity<?> listFiles(@RequestHeader String token) {
+    public ResponseEntity<?> listFiles(@RequestHeader("Authorization") String token) {
         try {
-            String userID = jwtTokenUtil.getUserIdFromToken(token);
-            Path endPath = this.root.resolve(userID);
-            return ResponseEntity.ok().body(Files.list(endPath).map(Path::toString).collect(Collectors.toList()));
+            String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
+            User user = userRepository.findById(Integer.parseInt(userID)).get();
+            return ResponseEntity.ok().body(user.getArtistData().getImages());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
