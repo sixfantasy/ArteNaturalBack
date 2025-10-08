@@ -22,7 +22,7 @@ public class UserController {
         return userRepository.findAll();
     }
     @GetMapping("/me")
-    public User getUserByToken(@RequestHeader String token) {
+    public User getUserByToken(@RequestHeader("Authorization") String token) {
         String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
         return userRepository.findById(Integer.parseInt(userID)).get();
     }
@@ -32,7 +32,7 @@ public class UserController {
         return userRepository.findById(id).orElse(null);
     }
     @PutMapping()
-    public User updateUser(@RequestBody User user, @RequestHeader String token) {
+    public User updateUser(@RequestBody User user, @RequestHeader("Authorization") String token) {
         return userRepository.save(user);
     }
     @DeleteMapping()
