@@ -2,6 +2,7 @@ package com.artenatural.Back.controllers;
 
 import com.artenatural.Back.entities.Role;
 import com.artenatural.Back.entities.User;
+import com.artenatural.Back.repositories.RoleRepository;
 import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
 import com.artenatural.Back.DTO.UserPass;
@@ -20,6 +21,9 @@ import java.util.ArrayList;
 
         @Autowired
         private JwtTokenUtil jwtTokenUtil;
+
+        @Autowired
+        private RoleRepository roleRepository;
 
         @Autowired
         private UserRepository userRepository;
@@ -41,7 +45,7 @@ import java.util.ArrayList;
                 }
                 User user = new User(userPass.getUsername(), passwordEncoder.encode(userPass.getPassword()));
                 user.setRoles(new ArrayList<>());
-                user.getRoles().add(new Role(userPass.getRole()));
+            user.getRoles().add(roleRepository.findByRoleName(userPass.getRole()));
                 userRepository.save(user);
                 return ResponseEntity.ok("User registered successfully!");
         }
@@ -49,7 +53,5 @@ import java.util.ArrayList;
         public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String auth){
                 jwtTokenUtil.getAllClaimsFromToken(auth.substring(7));
                 return ResponseEntity.ok("Token is valid");
-
-
             }
         }
