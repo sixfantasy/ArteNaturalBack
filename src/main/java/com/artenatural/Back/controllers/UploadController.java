@@ -22,9 +22,7 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class UploadController {
     private final  String projectPath = System.getProperty("user.dir");
-    @Value("${app.images-path}")
-    private String imagesPath;
-    private Path root;
+    private final  Path root = Paths.get(this.projectPath,"Static", "Images");
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
@@ -33,7 +31,6 @@ public class UploadController {
     @PostMapping("/upload")
     public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) {
         try {
-            this.root = Paths.get(this.imagesPath);
             String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
             System.out.println("userID = " + userID);
             User user = userRepository.findById(Integer.parseInt(userID)).get();
