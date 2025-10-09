@@ -66,4 +66,18 @@ public class UploadController {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> listAllImages() {
+        try {
+            var allImages = userRepository.findAll().stream()
+                    .filter(u -> u.getArtistData() != null && u.getArtistData().getImages() != null)
+                    .flatMap(u -> u.getArtistData().getImages().stream())
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(allImages);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al obtener todas las imágenes");
+        }
+    }
+
 }
