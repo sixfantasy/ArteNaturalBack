@@ -2,6 +2,7 @@ package com.artenatural.Back.entities;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -39,8 +40,14 @@ import lombok.Setter;
         private boolean accountNonLocked;
         private boolean credentialsNonExpired;
         private boolean enabled;
-        private int age;
+        private Date birthdate;
+        private String mail;
         private String interests;
+        private double balance;
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<Purchase> orders;
+        @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private Purchase currentPurchase;
 
         @ManyToMany
         private List<Role> roles;

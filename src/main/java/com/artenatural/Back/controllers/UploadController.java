@@ -5,7 +5,6 @@ import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
 import com.artenatural.Back.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/uploads")
@@ -66,4 +64,26 @@ public class UploadController {
             throw new RuntimeException(e.getMessage());
         }
     }
+    @GetMapping("/list/{id}")
+    public ResponseEntity<?> listFiles(@PathVariable int id) {
+        try {
+            User user = userRepository.findById(id).get();
+            return ResponseEntity.ok().body(user.getArtistData().getImages());
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    @GetMapping("/list/all")
+    public ResponseEntity<?> listAllFiles() {
+        try {
+            return ResponseEntity.ok().body(Files.walk(root)
+                    .filter(p -> !Files.isDirectory(p))
+                    .map(Path::toString)
+                    .map(s-> s.substring(s.indexOf("Images")-1)
+                            .replace("\\","/")));
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
 }
