@@ -49,7 +49,7 @@ import java.util.ArrayList;
                     user.setBirthdate(userPass.getBirthdate());
                 if (userPass.getMail() != null)
                     user.setMail(userPass.getMail());
-            user.getRoles().add(roleRepository.findByRoleName(userPass.getRole()));
+                user.getRoles().add(roleRepository.findByRoleName(userPass.getRole()));
                 userRepository.save(user);
                 return ResponseEntity.ok("User registered successfully!");
         }
