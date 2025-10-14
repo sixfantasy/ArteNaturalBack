@@ -17,7 +17,7 @@ public class ArtistData {
     @ElementCollection
     private List<String> images;
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> Products;
+    private List<Product> products;
     @JsonIgnore
     @OneToOne(mappedBy = "artistData")
     private User user;

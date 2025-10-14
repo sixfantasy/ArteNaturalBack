@@ -38,6 +38,8 @@ public class ProductController {
     public Product createProduct(@RequestHeader("Authorization") String token, @RequestBody Product product) {
         String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
         User user = userRepository.findById(Integer.parseInt(userID)).get();
+        product.setArtist(user.getArtistData());
+        product.getOptions().
         if (user.getArtistData() == null) {
             ArtistData artistData = new ArtistData();
             artistData.setProducts(new ArrayList<>());
@@ -46,6 +48,7 @@ public class ProductController {
         }
         else
             user.getArtistData().getProducts().add(product);
+
         userRepository.save(user);
         return product;
     }
