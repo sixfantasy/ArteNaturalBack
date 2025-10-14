@@ -66,17 +66,25 @@ public class UploadController {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    @GetMapping("/all")
-    public ResponseEntity<?> listAllImages() {
+    @GetMapping("/list/{id}")
+    public ResponseEntity<?> listFiles(@PathVariable int id) {
         try {
-            var allImages = userRepository.findAll().stream()
-                    .filter(u -> u.getArtistData() != null && u.getArtistData().getImages() != null)
-                    .flatMap(u -> u.getArtistData().getImages().stream())
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(allImages);
+            User user = userRepository.findById(id).get();
+            return ResponseEntity.ok().body(user.getArtistData().getImages());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al obtener todas las imágenes");
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    @GetMapping("/list/all")
+    public ResponseEntity<?> listAllFiles() {
+        try {
+            return ResponseEntity.ok().body(Files.walk(root)
+                    .filter(p -> !Files.isDirectory(p))
+                    .map(Path::toString)
+                    .map(s-> s.substring(s.indexOf("Images")-1)
+                            .replace("\\","/")));
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 

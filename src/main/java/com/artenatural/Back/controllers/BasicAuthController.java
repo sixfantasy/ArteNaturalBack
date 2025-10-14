@@ -45,7 +45,11 @@ import java.util.ArrayList;
                 }
                 User user = new User(userPass.getUsername(), passwordEncoder.encode(userPass.getPassword()));
                 user.setRoles(new ArrayList<>());
-            user.getRoles().add(roleRepository.findByRoleName(userPass.getRole()));
+                if (userPass.getBirthdate() != null)
+                    user.setBirthdate(userPass.getBirthdate());
+                if (userPass.getMail() != null)
+                    user.setMail(userPass.getMail());
+                user.getRoles().add(roleRepository.findByRoleName(userPass.getRole()));
                 userRepository.save(user);
                 return ResponseEntity.ok("User registered successfully!");
         }
