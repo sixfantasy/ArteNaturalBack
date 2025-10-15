@@ -25,6 +25,7 @@ public class Product {
 
     private double price;
     private String image;
+    @JsonIgnore
     @JoinColumn(name = "artist_id")
     @ManyToOne
     private ArtistData artist;
