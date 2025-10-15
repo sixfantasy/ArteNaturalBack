@@ -47,7 +47,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
                                 "/auth/register","/Images/**",
-                                "/uploads/list/all").permitAll() // Permit access to specific endpoints
+                                "/uploads/list/all"
+                        ).permitAll() // Permit access to specific endpoints
                         .requestMatchers("/uploads/upload").hasAuthority("ARTIST")
                         .anyRequest().authenticated() // All other requests require authentication
                 )
