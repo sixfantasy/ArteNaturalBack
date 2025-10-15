@@ -2,10 +2,13 @@ package com.artenatural.Back.controllers;
 
 import com.artenatural.Back.entities.ArtistData;
 import com.artenatural.Back.entities.Product;
+import com.artenatural.Back.entities.ProductOptions;
 import com.artenatural.Back.entities.User;
+import com.artenatural.Back.repositories.ProductOptionsRepository;
 import com.artenatural.Back.repositories.ProductRepository;
 import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +21,8 @@ import java.util.List;
 public class ProductController {
     @Autowired
     private ProductRepository productRepository;
-
+    @Autowired
+    private ProductOptionsRepository productOptionsRepository;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
@@ -37,19 +41,29 @@ public class ProductController {
     @PostMapping()
     public Product createProduct(@RequestHeader("Authorization") String token, @RequestBody Product product) {
         String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
+
+
         User user = userRepository.findById(Integer.parseInt(userID)).get();
         product.setArtist(user.getArtistData());
-        product.getOptions().
+        //product.getOptions().set
         if (user.getArtistData() == null) {
             ArtistData artistData = new ArtistData();
             artistData.setProducts(new ArrayList<>());
             artistData.getProducts().add(product);
             user.setArtistData(artistData);
         }
-        else
-            user.getArtistData().getProducts().add(product);
+        else{
 
-        userRepository.save(user);
+
+        productRepository.save(product);
+            ProductOptions po = product.getOptions().get(0);
+
+            po.setProduct(product);
+            productOptionsRepository.save(po);
+
+        }
+
+
         return product;
     }
 
