@@ -45,7 +45,10 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 // Define authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login","/auth/register","/Images/**").permitAll() // Permit access to specific endpoints
+                        .requestMatchers("/auth/login",
+                                "/auth/register","/Images/**",
+                                "/uploads/list/all").permitAll() // Permit access to specific endpoints
+                        .requestMatchers("/uploads/upload").hasAuthority("ARTIST")
                         .anyRequest().authenticated() // All other requests require authentication
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
