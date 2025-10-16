@@ -1,5 +1,6 @@
 package com.artenatural.Back.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ public class PurchaseItem {
     private double total;
     private boolean detailsRequired;
     private String productDetails;
+    @JsonIgnore
     @ManyToOne
     private Purchase purchase;
 }

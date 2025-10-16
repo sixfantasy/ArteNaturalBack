@@ -20,7 +20,6 @@ public class Product {
     private String description;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("product") // ← Evita bucle infinito al serializar
     private List<ProductOptions> options;
 
     @JsonIgnore

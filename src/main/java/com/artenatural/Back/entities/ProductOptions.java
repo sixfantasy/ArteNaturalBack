@@ -1,5 +1,6 @@
 package com.artenatural.Back.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class ProductOptions {
     private String option;
     private double price;
 
+    @JsonIgnore
     @ManyToOne
-    @JsonIgnoreProperties("options") // ← Evita bucle infinito (buena práctica)
     private Product product;
 }
