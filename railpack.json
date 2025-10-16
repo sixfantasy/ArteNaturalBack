@@ -1,0 +1,20 @@
+{
+  "build": {
+    "base": "eclipse-temurin:21-jdk-alpine",
+    "buildCommand": "./mvnw clean package -DskipTests"
+  },
+  "deploy": {
+    "base": "eclipse-temurin:21-jdk-alpine",
+    "startCommand": "java -jar target/your-app.jar",
+    "inputs": [
+      {
+        "type": "local",
+        "include": ["target/your-app.jar"]
+      }
+    ],
+    "variables": {
+      "PORT": "${PORT}"
+    },
+    "aptPackages": []
+  }
+}
