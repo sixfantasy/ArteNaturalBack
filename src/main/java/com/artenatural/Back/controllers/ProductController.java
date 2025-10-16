@@ -8,8 +8,8 @@ import com.artenatural.Back.repositories.ProductOptionsRepository;
 import com.artenatural.Back.repositories.ProductRepository;
 import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -19,58 +19,69 @@ import java.util.List;
 @RequestMapping("/products")
 @CrossOrigin
 public class ProductController {
+
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private ProductOptionsRepository productOptionsRepository;
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping
-    public List<Product> getAllProducts() {
+
+    @GetMapping("/public")
+    @Transactional(readOnly = true)
+    public List<Product> getAllPublicProducts() {
         return productRepository.findAll();
     }
 
+
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public Product getProductById(@PathVariable int id) {
         return productRepository.findById(id).orElse(null);
     }
-    @PostMapping()
+
+
+    @PostMapping
     public Product createProduct(@RequestHeader("Authorization") String token, @RequestBody Product product) {
         String userID = jwtTokenUtil.getUserIdFromToken(token.substring(7));
+        User user = userRepository.findById(Integer.parseInt(userID)).orElse(null);
 
+        if (user == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
 
-        User user = userRepository.findById(Integer.parseInt(userID)).get();
-        product.setArtist(user.getArtistData());
-        //product.getOptions().set
         if (user.getArtistData() == null) {
             ArtistData artistData = new ArtistData();
             artistData.setProducts(new ArrayList<>());
-            artistData.getProducts().add(product);
             user.setArtistData(artistData);
         }
-        else{
 
+        product.setArtist(user.getArtistData());
+        Product savedProduct = productRepository.save(product);
 
-        productRepository.save(product);
-            ProductOptions po = product.getOptions().get(0);
-
-            po.setProduct(product);
-            productOptionsRepository.save(po);
-
+        // Guardar opciones si existen
+        if (product.getOptions() != null) {
+            for (ProductOptions option : product.getOptions()) {
+                option.setProduct(savedProduct);
+                productOptionsRepository.save(option);
+            }
         }
 
-
-        return product;
+        return savedProduct;
     }
 
-    @PutMapping()
+
+    @PutMapping
     public Product updateProduct(@RequestBody Product product) {
         return productRepository.save(product);
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable int id) {
