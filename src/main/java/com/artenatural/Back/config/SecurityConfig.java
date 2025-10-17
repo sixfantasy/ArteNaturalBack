@@ -40,8 +40,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    @Value("${app.local-domain-front}")
-    private String localDomainFront;
+
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
@@ -87,19 +86,5 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class).httpBasic(withDefaults());
 
         return http.build();
-    }
-
-    // ✅ CHANGE 4: Simplified CORS Configuration
-    @Bean
-    WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                // Chained methods for better readability
-                registry.addMapping("/**")
-                        .allowedOrigins(localDomainFront)
-                        .allowedMethods("POST", "PUT", "GET", "DELETE", "OPTIONS");
-            }
-        };
     }
 }
