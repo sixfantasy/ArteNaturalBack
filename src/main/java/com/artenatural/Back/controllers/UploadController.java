@@ -4,6 +4,7 @@ import com.artenatural.Back.entities.ArtistData;
 import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
 import com.artenatural.Back.entities.User;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,31 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class UploadController {
     // Reads the path '/Railway/Images' from the environment variable
-    @Value("${app.upload-dir}")
-    private String uploadDir;
-    private final  Path root = Paths.get(uploadDir);
+    // on most operating systems (including the one your local JVM runs on).
+    @Value("${app.upload-dir:/tmp/default-uploads}")
+    private String uploadDir; // No longer needs to be in application.properties
+
+    private Path root;
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private UserRepository userRepository;
+
+    @PostConstruct
+    public void init() {
+        try {
+            this.root = Paths.get(uploadDir);
+            // On Linux/Mac: /tmp/default-uploads. On Windows: a temp path.
+            // On Railway: /Railway/Images (overridden by ENV var).
+            Files.createDirectories(root);
+            System.out.println("File upload directory initialized at: " + this.root.toAbsolutePath());
+        } catch (Exception e) {
+            System.err.println("ERROR: Could not initialize storage location at " + uploadDir);
+            throw new RuntimeException("Could not initialize storage location!", e);
+        }
+    }
+
 
     @PostMapping("/upload")
     public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) {
