@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class UploadController {
     private final  String projectPath = System.getProperty("user.dir");
-    private final  Path root = Paths.get(this.projectPath,"Static", "Images");
+    private final  Path root = Paths.get(this.projectPath,"Railway", "Images");
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
