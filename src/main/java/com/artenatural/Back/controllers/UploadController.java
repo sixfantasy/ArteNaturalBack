@@ -21,7 +21,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/uploads")
 @CrossOrigin
 public class UploadController {
-    private final  Path root = Paths.get("/Railway/Images");
+    // Reads the path '/Railway/Images' from the environment variable
+    @Value("${app.upload-dir}")
+    private String uploadDir;
+    private final  Path root = Paths.get(uploadDir);
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
