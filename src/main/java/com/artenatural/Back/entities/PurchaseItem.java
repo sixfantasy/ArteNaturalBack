@@ -21,5 +21,6 @@ public class PurchaseItem {
     private String productDetails;
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 }

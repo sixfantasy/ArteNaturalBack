@@ -1,10 +1,14 @@
 package com.artenatural.Back.controllers;
 
-import com.artenatural.Back.entities.*;
+import com.artenatural.Back.entities.Purchase;
+import com.artenatural.Back.entities.PurchaseItem;
+import com.artenatural.Back.entities.User;
 import com.artenatural.Back.repositories.ProductRepository;
 import com.artenatural.Back.repositories.PurchaseRepository;
 import com.artenatural.Back.repositories.UserRepository;
 import com.artenatural.Back.utils.JwtTokenUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,47 +39,45 @@ public class PurchaseController {
             @RequestHeader("Authorization") String authHeader,
             @RequestBody PurchaseRequest request) {
 
-        String token = authHeader.substring(7);
-        String userId = jwtTokenUtil.getUserIdFromToken(token);
-        User user = userRepository.findById(Integer.parseInt(userId)).orElse(null);
+        try {
+            String token = authHeader.substring(7);
+            String userId = jwtTokenUtil.getUserIdFromToken(token);
+            User user = userRepository.findById(Integer.parseInt(userId))
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (user == null) {
+            // Crear la compra
+            Purchase purchase = new Purchase();
+            purchase.setUser(user);
+            purchase.setStatus(Purchase.Status.COMPLETED);
+            purchase.setTotal(request.getTotal());
+
+            // Crear los items
+            List<PurchaseItem> items = new ArrayList<>();
+            for (CartItemDto itemDto : request.getItems()) {
+                PurchaseItem item = new PurchaseItem();
+                item.setPurchase(purchase);
+                item.setProduct(productRepository.findById(itemDto.getProductId())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado")));
+                item.setQuantity(1);
+                item.setPrice(itemDto.getBasePrice());
+                item.setTotal(itemDto.getTotalPrice());
+                item.setDetailsRequired(false);
+                item.setProductDetails(buildDetailsString(itemDto.getSelectedOptions()));
+                items.add(item);
+            }
+            purchase.setItems(items);
+
+            Purchase saved = purchaseRepository.save(purchase);
+            return ResponseEntity.ok(saved);
+
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
-
-        // Crear la compra
-        Purchase purchase = new Purchase();
-        purchase.setUser(user);
-        purchase.setStatus(Purchase.Status.COMPLETED); // o PROCESSING si prefieres
-        purchase.setTotal(request.getTotal());
-
-        // Guardar datos del cliente (opcional: podrías guardarlos en User si es nuevo)
-        // Por ahora, los guardamos como JSON en un campo o en una entidad separada si la tienes
-        // Aquí los dejamos en memoria; en producción, crea una entidad `Customer` o `ShippingAddress`
-
-        // Crear los items del carrito
-        List<PurchaseItem> items = new ArrayList<>();
-        for (CartItemDto itemDto : request.getItems()) {
-            PurchaseItem item = new PurchaseItem();
-            item.setPurchase(purchase);
-            item.setProduct(productRepository.findById(itemDto.getProductId()).orElse(null));
-            item.setQuantity(1); // asumiendo 1 unidad por producto
-            item.setPrice(itemDto.getBasePrice());
-            item.setTotal(itemDto.getTotalPrice());
-            item.setDetailsRequired(false); // ajusta si necesitas detalles
-            item.setProductDetails(buildDetailsString(itemDto.getSelectedOptions()));
-            items.add(item);
-        }
-
-        purchase.setItems(items);
-        Purchase saved = purchaseRepository.save(purchase);
-        return ResponseEntity.ok(saved);
     }
 
     private String buildDetailsString(Map<String, Double> options) {
-        if (options == null || options.isEmpty()) {
-            return "";
-        }
+        if (options == null || options.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Double> entry : options.entrySet()) {
             sb.append(entry.getKey())
@@ -86,54 +88,35 @@ public class PurchaseController {
         return sb.toString();
     }
 
-    // DTO principal
+    // DTOs con @Getter y @Setter
     public static class PurchaseRequest {
+        @Getter @Setter
         private List<CartItemDto> items;
+        @Getter @Setter
         private double total;
+        @Getter @Setter
         private CustomerDto customer;
+        @Getter @Setter
         private String paymentMethod;
-
-        // Getters y setters
-        public List<CartItemDto> getItems() { return items; }
-        public void setItems(List<CartItemDto> items) { this.items = items; }
-        public double getTotal() { return total; }
-        public void setTotal(double total) { this.total = total; }
-        public CustomerDto getCustomer() { return customer; }
-        public void setCustomer(CustomerDto customer) { this.customer = customer; }
-        public String getPaymentMethod() { return paymentMethod; }
-        public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     }
 
-    // DTO para cada item del carrito
     public static class CartItemDto {
+        @Getter @Setter
         private int productId;
+        @Getter @Setter
         private double basePrice;
+        @Getter @Setter
         private double totalPrice;
-        private Map<String, Double> selectedOptions; // Ej: {"Tamaño": 10.0, "Color": 5.0}
-
-        // Getters y setters
-        public int getProductId() { return productId; }
-        public void setProductId(int productId) { this.productId = productId; }
-        public double getBasePrice() { return basePrice; }
-        public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
-        public double getTotalPrice() { return totalPrice; }
-        public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
-        public Map<String, Double> getSelectedOptions() { return selectedOptions; }
-        public void setSelectedOptions(Map<String, Double> selectedOptions) { this.selectedOptions = selectedOptions; }
+        @Getter @Setter
+        private Map<String, Double> selectedOptions;
     }
 
-    // DTO para datos del cliente
     public static class CustomerDto {
+        @Getter @Setter
         private String name;
+        @Getter @Setter
         private String email;
+        @Getter @Setter
         private String address;
-
-        // Getters y setters
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getAddress() { return address; }
-        public void setAddress(String address) { this.address = address; }
     }
 }

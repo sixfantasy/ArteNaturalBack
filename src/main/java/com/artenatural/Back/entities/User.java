@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,9 +48,8 @@ import lombok.Setter;
         private String interests;
         private double balance;
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonIgnoreProperties("user")
         private List<Purchase> orders;
-        @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-        private Purchase currentPurchase;
 
         @ManyToMany(fetch = FetchType.EAGER)
         private List<Role> roles;
