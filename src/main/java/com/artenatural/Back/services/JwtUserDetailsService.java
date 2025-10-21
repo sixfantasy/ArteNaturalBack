@@ -2,7 +2,6 @@ package com.artenatural.Back.services;
 
 import com.artenatural.Back.entities.User;
 import com.artenatural.Back.repositories.UserRepository;
-import com.artenatural.Back.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +20,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new CustomUserDetails(user); 
+        return user;
     }
 }
