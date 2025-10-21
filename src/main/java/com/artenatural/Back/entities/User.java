@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Getter;
@@ -45,11 +48,10 @@ import lombok.Setter;
         private String interests;
         private double balance;
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonIgnoreProperties("user")
         private List<Purchase> orders;
-        @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-        private Purchase currentPurchase;
 
-        @ManyToMany
+        @ManyToMany(fetch = FetchType.EAGER)
         private List<Role> roles;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -57,8 +59,8 @@ import lombok.Setter;
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
-            // Devolvemos un ArrayList vacío porque nuestra app no tiene roles
-            return new ArrayList<>();
+            return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                    .collect(Collectors.toList());
         }
 
         @Override
@@ -91,3 +93,4 @@ import lombok.Setter;
             return password;
         }
     }
+

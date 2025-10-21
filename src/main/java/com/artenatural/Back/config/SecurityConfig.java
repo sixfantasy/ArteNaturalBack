@@ -16,15 +16,31 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import java.util.Arrays;
+
+import java.util.List;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
-    @Value("${app.local-domain-front}")
-    private String localDomainFront;
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*")); // permite cualquier origen
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
@@ -43,7 +59,7 @@ public class SecurityConfig {
         http
                 // Disable CSRF since we are using JWT (stateless)
                 .csrf(csrf -> csrf.disable())
-                .cors(withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // Define authorization rules
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
@@ -70,19 +86,5 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class).httpBasic(withDefaults());
 
         return http.build();
-    }
-
-    // ✅ CHANGE 4: Simplified CORS Configuration
-    @Bean
-    WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                // Chained methods for better readability
-                registry.addMapping("/**")
-                        .allowedOrigins(localDomainFront)
-                        .allowedMethods("POST", "PUT", "GET", "DELETE", "OPTIONS");
-            }
-        };
     }
 }
