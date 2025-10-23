@@ -113,13 +113,7 @@ public class UploadController {
 
             String relativePath = dbPath.replaceFirst("/Images/", "");
             Path imagePathToDelete = this.root.resolve(relativePath);
-            if (Files.exists(imagePathToDelete)) {
-                Files.delete(imagePathToDelete);
-                System.out.println("File system deletion successful: " + imagePathToDelete.toAbsolutePath());
-            } else {
-                System.err.println("WARNING: File not found on disk at: " + imagePathToDelete.toAbsolutePath());
-            }
-
+            Files.delete(imagePathToDelete);
             Integer id = Integer.parseInt(jwtTokenUtil.getUserIdFromToken(token.substring(7)));
             User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
             user.getArtistData().getImages().remove(dbPath);
