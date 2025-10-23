@@ -68,6 +68,8 @@ public class SecurityConfig {
                         //  Rutas públicas por método HTTP: cualquier GET a /products/...
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
 
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         //  Solo artistas pueden subir imágenes
                         .requestMatchers("/uploads/upload").hasAuthority("ARTIST")
 
