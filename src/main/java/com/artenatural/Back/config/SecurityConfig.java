@@ -37,7 +37,8 @@ public class SecurityConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "https://artenaturalback-production.up.railway.app",
-                                "http://localhost:8082"
+                                "http://localhost:8082",
+                                "https://mortee199918.github.io/ArteNatural-Front/"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
