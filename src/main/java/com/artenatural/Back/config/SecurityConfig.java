@@ -49,7 +49,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://artenaturalback-production.up.railway.app",
+        configuration.setAllowedOrigins(Arrays.asList("https://artenaturalback-production.up.railway.app",
                 "http://localhost:8082"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
