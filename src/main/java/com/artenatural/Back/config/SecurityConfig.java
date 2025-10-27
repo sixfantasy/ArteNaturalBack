@@ -29,7 +29,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
+    /*@Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
@@ -37,20 +37,20 @@ public class SecurityConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "https://artenaturalback-production.up.railway.app",
-                                "http://localhost:8082",
-                                "https://mortee199918.github.io/ArteNatural-Front/"
+                                "http://localhost:8082"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
-    }
+    }*/
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*")); // permite cualquier origen
+        configuration.setAllowedOrigins(List.of("https://artenaturalback-production.up.railway.app",
+                "http://localhost:8082"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
