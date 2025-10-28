@@ -51,6 +51,15 @@ public class PurchaseController {
             purchase.setStatus(Purchase.Status.COMPLETED);
             purchase.setTotal(request.getTotal());
 
+            // ✅ Guardar datos del cliente y método de pago
+            if (request.getCustomer() != null) {
+                purchase.setCustomerName(request.getCustomer().getName());
+                purchase.setCustomerEmail(request.getCustomer().getEmail());
+                purchase.setCustomerAddress(request.getCustomer().getAddress());
+            }
+            purchase.setPaymentMethod(request.getPaymentMethod()); // ✅
+
+
             // Crear los items
             List<PurchaseItem> items = new ArrayList<>();
             for (CartItemDto itemDto : request.getItems()) {

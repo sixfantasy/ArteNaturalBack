@@ -32,9 +32,17 @@ public class Purchase {
     @JsonIgnoreProperties("orders") // Evita bucle: Purchase → User → Purchase
     private User user;
 
+    private String customerName;
+    private String customerEmail;
+    private String customerAddress;
+    private String paymentMethod; // "card", "paypal", "bizum"
+
     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("purchase") // Evita bucle: PurchaseItem → Purchase → PurchaseItem
     private List<PurchaseItem> items = new ArrayList<>();
 
+
     private double total;
+
+
 }

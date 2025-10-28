@@ -49,7 +49,7 @@ import lombok.Setter;
         private double balance;
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
         @JsonIgnoreProperties("user")
-        private List<Purchase> orders;
+        private List<Purchase> orders = new ArrayList<>();
 
         @ManyToMany(fetch = FetchType.EAGER)
         private List<Role> roles;
