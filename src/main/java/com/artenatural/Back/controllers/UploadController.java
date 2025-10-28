@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/uploads")
@@ -108,5 +107,23 @@ public class UploadController {
             throw new RuntimeException(e.getMessage());
         }
     }
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String token, @RequestBody String dbPath) {
+        try {
 
+            String relativePath = dbPath.replaceFirst("/Images/", "");
+            Path imagePathToDelete = this.root.resolve(relativePath);
+            Files.delete(imagePathToDelete);
+            Integer id = Integer.parseInt(jwtTokenUtil.getUserIdFromToken(token.substring(7)));
+            User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+            user.getArtistData().getImages().remove(dbPath);
+            userRepository.save(user);
+
+            return ResponseEntity.ok().body("Archivo eliminado con éxito");
+
+        } catch (Exception e) {
+            System.err.println("Error during file deletion: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("{\"error\":\"Error al eliminar el archivo: " + e.getMessage() + "\"}");
+        }
+    }
 }

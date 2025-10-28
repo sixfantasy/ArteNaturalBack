@@ -29,6 +29,23 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    /*@Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins(
+                                "https://artenaturalback-production.up.railway.app",
+                                "http://localhost:8082"
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
+    }*/
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -67,6 +84,8 @@ public class SecurityConfig {
                                 "/uploads/list/all").permitAll() // Permit access to specific endpoints
                         //  Rutas públicas por método HTTP: cualquier GET a /products/...
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         //  Solo artistas pueden subir imágenes
                         .requestMatchers("/uploads/upload").hasAuthority("ARTIST")
