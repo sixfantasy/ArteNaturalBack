@@ -17,6 +17,7 @@ public class PurchaseItem {
     private int quantity;
     private double price;
     private double total;
+    private String customMessage;
     private boolean detailsRequired;
     private String productDetails;
     @JsonIgnore
