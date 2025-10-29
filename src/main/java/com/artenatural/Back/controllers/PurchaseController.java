@@ -70,6 +70,7 @@ public class PurchaseController {
                 item.setQuantity(1);
                 item.setPrice(itemDto.getBasePrice());
                 item.setTotal(itemDto.getTotalPrice());
+                item.setCustomMessage(itemDto.getCustomMessage());
                 item.setDetailsRequired(false);
                 item.setProductDetails(buildDetailsString(itemDto.getSelectedOptions()));
                 items.add(item);
@@ -118,6 +119,8 @@ public class PurchaseController {
         private double totalPrice;
         @Getter @Setter
         private Map<String, Double> selectedOptions;
+        @Getter @Setter
+        private String customMessage;
     }
 
     public static class CustomerDto {
